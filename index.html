@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swedish Vocabulary Tracker</title>
+    <style>
+        :root {
+            --primary: #005B99;
+            --primary-light: #0077CC;
+            --accent: #FFCC00;
+            --background: #F5F9FC;
+            --card: #FFFFFF;
+            --text: #333333;
+            --text-light: #666666;
+            --error: #E53935;
+            --success: #43A047;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h1 span {
+            color: var(--accent);
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        h3 {
+            color: var(--primary);
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .search-box {
+            background: var(--card);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        input, textarea, button {
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        input, textarea {
+            width: 100%;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            min-width: 100px;
+        }
+
+        button:hover {
+            background-color: var(--primary-light);
+        }
+
+        button.secondary {
+            background-color: #f1f1f1;
+            color: var(--text);
+            border: 1px solid #ddd;
+        }
+
+        button.secondary:hover {
+            background-color: #e5e5e5;
+        }
+
+        .word-details {
+            background: var(--card);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .sentence {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .sentence-date {
+            color: var(--text-light);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .add-sentence {
+            margin-top: 20px;
+        }
+
+        .tab-container {
+            margin-top: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .word-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .word-card {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .word-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .word-card h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+        .word-stats {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .error-message {
+            color: var(--error);
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            color: var(--success);
+            margin-top: 5px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .placeholder {
+            color: var(--text-light);
+            text-align: center;
+            padding: 30px;
+        }
+
+        .stats-box {
+            background: var(--card);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            background: var(--background);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .confirmation-dialog {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .dialog-content {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .file-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .welcome-dialog {
+            max-width: 500px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .data-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .save-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 100;
+            animation: fadeIn 0.3s, fadeOut 0.3s 2.7s;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .unsaved-changes {
+            display: inline-block;
+            color: var(--error);
+            font-weight: 500;
+            margin-left: 10px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .file-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Swedish <span>Vocabulary</span> Tracker</h1>
+            <div class="data-controls">
+                <div>
+                    <button id="open-file-button" class="secondary">Load Data</button>
+                    <button id="save-file-button">Save Data</button>
+                    <span id="unsaved-changes" class="unsaved-changes" style="display: none;">Unsaved changes</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="search-box">
+            <h2>Search or Add Words</h2>
+            <div class="search-form">
+                <input type="text" id="word-input" placeholder="Enter a Swedish word...">
+                <button id="search-button">Search</button>
+            </div>
+            <div id="search-message" class="error-message"></div>
+        </div>
+
+        <div id="word-details" class="word-details">
+            <h2 id="word-title"></h2>
+            <div>
+                <p>Searches: <span id="search-count">0</span> times</p>
+                <p>Last visited: <span id="last-visited"></span></p>
+            </div>
+            
+            <h3>Example Sentences</h3>
+            <div id="sentences-container"></div>
+            
+            <div class="add-sentence">
+                <h3>Add New Sentence</h3>
+                <textarea id="new-sentence" placeholder="Write an example sentence using this word..."></textarea>
+                <button id="add-sentence-button" style="margin-top: 10px;">Add Sentence</button>
+            </div>
+        </div>
+
+        <div class="tab-container">
+            <div class="tabs">
+                <div class="tab active" data-tab="stats">Statistics</div>
+                <div class="tab" data-tab="all-words">All Words</div>
+                <div class="tab" data-tab="neglected">Neglected Words</div>
+            </div>
+            
+            <div id="stats-tab" class="tab-content active">
+                <div class="stats-box">
+                    <h2>Your Vocabulary Stats</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-words">0</div>
+                            <div class="stat-label">Total Words</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-sentences">0</div>
+                            <div class="stat-label">Total Sentences</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="total-searches">0</div>
+                            <div class="stat-label">Total Searches</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="added-this-month">0</div>
+                            <div class="stat-label">Added This Month</div>
+                        </div>
+                    </div>
+                    
+                    <h3>Most Searched Words</h3>
+                    <div id="most-searched-words" class="word-list"></div>
+                </div>
+            </div>
+            
+            <div id="all-words-tab" class="tab-content">
+                <h2>All Words</h2>
+                <div id="all-words-list" class="word-list"></div>
+                <div id="all-words-placeholder" class="placeholder">No words added yet. Search for a word to get started!</div>
+            </div>
+            
+            <div id="neglected-tab" class="tab-content">
+                <h2>Neglected Words</h2>
+                <p>Words you haven't visited in over 30 days:</p>
+                <div id="neglected-words-list" class="word-list"></div>
+                <div id="neglected-placeholder" class="placeholder">No neglected words found!</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Word Confirmation Dialog -->
+    <div id="add-confirmation" class="confirmation-dialog">
+        <div class="dialog-content">
+            <h3>Add New Word</h3>
+            <p>Would you like to add "<span id="confirm-word"></span>" to your vocabulary list?</p>
+            <div class="dialog-buttons">
+                <button id="cancel-add" class="secondary">Cancel</button>
+                <button id="confirm-add">Add Word</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Welcome Dialog -->
+    <div id="welcome-dialog" class="confirmation-dialog">
+        <div class="dialog-content welcome-dialog">
+            <h3>Welcome to Swedish Vocabulary Tracker</h3>
+            <p>Would you like to load an existing vocabulary file or start with a new one?</p>
+            <div class="file-controls">
+                <button id="new-data" class="secondary">Start New</button>
+                <button id="load-existing">Load Existing File</button>
+            </div>
+            <p style="margin-top: 15px; font-size: 14px; color: var(--text-light);">
+                Note: Your vocabulary data is stored in a file on your device. 
+                Make sure to save your data regularly!
+            </p>
+        </div>
+    </div>
+    
+    <!-- Hidden file input for loading data -->
+    <input type="file" id="file-input" class="file-input" accept=".json">
+    
+    <!-- Save notification -->
+    <div id="save-notification" class="save-notification">
+        Data saved successfully!
+    </div>
+
+    <script>
+        // DOM Elements
+        const wordInput = document.getElementById('word-input');
+        const searchButton = document.getElementById('search-button');
+        const searchMessage = document.getElementById('search-message');
+        const wordDetails = document.getElementById('word-details');
+        const wordTitle = document.getElementById('word-title');
+        const searchCount = document.getElementById('search-count');
+        const lastVisited = document.getElementById('last-visited');
+        const sentencesContainer = document.getElementById('sentences-container');
+        const newSentence = document.getElementById('new-sentence');
+        const addSentenceButton = document.getElementById('add-sentence-button');
+        const totalWords = document.getElementById('total-words');
+        const totalSentences = document.getElementById('total-sentences');
+        const totalSearches = document.getElementById('total-searches');
+        const addedThisMonth = document.getElementById('added-this-month');
+        const mostSearchedWords = document.getElementById('most-searched-words');
+        const allWordsList = document.getElementById('all-words-list');
+        const neglectedWordsList = document.getElementById('neglected-words-list');
+        const allWordsPlaceholder = document.getElementById('all-words-placeholder');
+        const neglectedPlaceholder = document.getElementById('neglected-placeholder');
+        const addConfirmation = document.getElementById('add-confirmation');
+        const confirmWord = document.getElementById('confirm-word');
+        const cancelAdd = document.getElementById('cancel-add');
+        const confirmAdd = document.getElementById('confirm-add');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const welcomeDialog = document.getElementById('welcome-dialog');
+        const newDataButton = document.getElementById('new-data');
+        const loadExistingButton = document.getElementById('load-existing');
+        const fileInput = document.getElementById('file-input');
+        const openFileButton = document.getElementById('open-file-button');
+        const saveFileButton = document.getElementById('save-file-button');
+        const saveNotification = document.getElementById('save-notification');
+        const unsavedChanges = document.getElementById('unsaved-changes');
+
+        // Variables
+        let currentWord = null;
+        let vocabulary = {};
+        let stats = {
+            totalSearches: 0,
+            lastUpdated: new Date().toISOString()
+        };
+        let hasUnsavedChanges = false;
+
+        // Functions
+        function markUnsavedChanges() {
+            hasUnsavedChanges = true;
+            unsavedChanges.style.display = 'inline-block';
+        }
+
+        function clearUnsavedChanges() {
+            hasUnsavedChanges = false;
+            unsavedChanges.style.display = 'none';
+        }
+
+        function showSaveNotification() {
+            saveNotification.style.display = 'block';
+            saveNotification.style.opacity = '1';
+            
+            setTimeout(() => {
+                saveNotification.style.display = 'none';
+                saveNotification.style.opacity = '0';
+            }, 3000);
+        }
+
+        function saveDataToFile() {
+            // Create data object
+            const data = {
+                vocabulary: vocabulary,
+                stats: stats,
+                version: "1.0",
+                lastSaved: new Date().toISOString()
+            };
+            
+            // Convert to JSON string
+            const jsonData = JSON.stringify(data, null, 2);
+            
+            // Create a Blob
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            
+            // Create download link and trigger download
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `swedish-vocabulary-${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            // Clear unsaved changes
+            clearUnsavedChanges();
+            showSaveNotification();
+        }
+
+        function loadDataFromFile(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Validate data structure
+                    if (data.vocabulary && data.stats) {
+                        vocabulary = data.vocabulary;
+                        stats = data.stats;
+                        updateStats();
+                        clearUnsavedChanges();
+                    } else {
+                        alert("Invalid data file. The file doesn't contain vocabulary data.");
+                    }
+                } catch (error) {
+                    alert("Error loading data file. The file might be corrupted.");
+                    console.error(error);
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function daysAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+
+        function searchWord() {
+            const word = wordInput.value.trim().toLowerCase();
+            
+            if (!word) {
+                searchMessage.textContent = 'Please enter a word';
+                return;
+            }
+            
+            searchMessage.textContent = '';
+            stats.totalSearches++;
+            markUnsavedChanges();
+            
+            if (vocabulary[word]) {
+                // Word exists
+                currentWord = word;
+                vocabulary[word].searchCount++;
+                vocabulary[word].lastVisited = new Date().toISOString();
+                displayWordDetails();
+            } else {
+                // Word doesn't exist
+                currentWord = word;
+                showAddConfirmation();
+            }
+            
+            updateStats();
+        }
+
+        function showAddConfirmation() {
+            confirmWord.textContent = currentWord;
+            addConfirmation.style.display = 'flex';
+        }
+
+        function hideAddConfirmation() {
+            addConfirmation.style.display = 'none';
+        }
+
+        function addNewWord() {
+            if (!currentWord) return;
+            
+            vocabulary[currentWord] = {
+                word: currentWord,
+                sentences: [],
+                dateAdded: new Date().toISOString(),
+                lastVisited: new Date().toISOString(),
+                searchCount: 1
+            };
+            
+            markUnsavedChanges();
+            displayWordDetails();
+            updateStats();
+            hideAddConfirmation();
+        }
+
+        function displayWordDetails() {
+            if (!currentWord || !vocabulary[currentWord]) return;
+            
+            const wordData = vocabulary[currentWord];
+            
+            wordTitle.textContent = wordData.word;
+            searchCount.textContent = wordData.searchCount;
+            lastVisited.textContent = formatDate(wordData.lastVisited);
+            
+            // Clear sentences container
+            sentencesContainer.innerHTML = '';
+            
+            // Add sentences
+            if (wordData.sentences.length === 0) {
+                sentencesContainer.innerHTML = '<p class="placeholder">No sentences added yet. Add your first example sentence below!</p>';
+            } else {
+                wordData.sentences.forEach((sentenceData, index) => {
+                    const sentenceElement = document.createElement('div');
+                    sentenceElement.className = 'sentence';
+                    sentenceElement.innerHTML = `
+                        <p>${sentenceData.text}</p>
+                        <p class="sentence-date">Added on ${formatDate(sentenceData.date)}</p>
+                    `;
+                    sentencesContainer.appendChild(sentenceElement);
+                });
+            }
+            
+            // Show word details
+            wordDetails.style.display = 'block';
+            newSentence.value = '';
+        }
+
+        function addSentence() {
+            if (!currentWord || !vocabulary[currentWord]) return;
+            
+            const sentence = newSentence.value.trim();
+            
+            if (!sentence) {
+                return;
+            }
+            
+            vocabulary[currentWord].sentences.push({
+                text: sentence,
+                date: new Date().toISOString()
+            });
+            
+            vocabulary[currentWord].lastVisited = new Date().toISOString();
+            markUnsavedChanges();
+            displayWordDetails();
+            updateStats();
+            
+            newSentence.value = '';
+        }
+
+        function updateStats() {
+            // Calculate stats
+            let wordCount = Object.keys(vocabulary).length;
+            let sentenceCount = 0;
+            let addedThisMonthCount = 0;
+            const now = new Date();
+            const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            
+            Object.values(vocabulary).forEach(word => {
+                sentenceCount += word.sentences.length;
+                
+                const addedDate = new Date(word.dateAdded);
+                if (addedDate >= firstDayOfMonth) {
+                    addedThisMonthCount++;
+                }
+            });
+            
+            // Update stats display
+            totalWords.textContent = wordCount;
+            totalSentences.textContent = sentenceCount;
+            totalSearches.textContent = stats.totalSearches;
+            addedThisMonth.textContent = addedThisMonthCount;
+            
+            // Most searched words (top 5)
+            const sortedWords = Object.values(vocabulary)
+                .sort((a, b) => b.searchCount - a.searchCount)
+                .slice(0, 5);
+            
+            mostSearchedWords.innerHTML = '';
+            
+            if (sortedWords.length === 0) {
+                mostSearchedWords.innerHTML = '<p class="placeholder">No words searched yet!</p>';
+            } else {
+                sortedWords.forEach(word => {
+                    const wordCard = document.createElement('div');
+                    wordCard.className = 'word-card';
+                    wordCard.innerHTML = `
+                        <h3>${word.word}</h3>
+                        <p class="word-stats">Searched ${word.searchCount} times</p>
+                    `;
+                    wordCard.addEventListener('click', () => {
+                        wordInput.value = word.word;
+                        searchWord();
+                    });
+                    mostSearchedWords.appendChild(wordCard);
+                });
+            }
+            
+            // Update all words list
+            updateWordLists();
+        }
+
+        function updateWordLists() {
+            // All words list
+            allWordsList.innerHTML = '';
+            const allWords = Object.values(vocabulary);
+            
+            if (allWords.length === 0) {
+                allWordsPlaceholder.style.display = 'block';
+            } else {
+                allWordsPlaceholder.style.display = 'none';
+                
+                allWords.sort((a, b) => a.word.localeCompare(b.word));
+                
+                allWords.forEach(word => {
+                    const wordCard = document.createElement('div');
+                    wordCard.className = 'word-card';
+                    wordCard.innerHTML = `
+                        <h3>${word.word}</h3>
+                        <p class="word-stats">${word.sentences.length} sentences</p>
+                        <p class="word-stats">Last visited: ${formatDate(word.lastVisited)}</p>
+                    `;
+                    wordCard.addEventListener('click', () => {
+                        wordInput.value = word.word;
+                        searchWord();
+                    });
+                    allWordsList.appendChild(wordCard);
+                });
+            }
+            
+            // Neglected words list (not visited in 30+ days)
+            neglectedWordsList.innerHTML = '';
+            const neglectedWords = Object.values(vocabulary).filter(word => {
+                return daysAgo(word.lastVisited) >= 30;
+            });
+            
+            if (neglectedWords.length === 0) {
+                neglectedPlaceholder.style.display = 'block';
+            } else {
+                neglectedPlaceholder.style.display = 'none';
+                
+                neglectedWords.sort((a, b) => {
+                    return new Date(a.lastVisited) - new Date(b.lastVisited);
+                });
+                
+                neglectedWords.forEach(word => {
+                    const wordCard = document.createElement('div');
+                    wordCard.className = 'word-card';
+                    wordCard.innerHTML = `
+                        <h3>${word.word}</h3>
+                        <p class="word-stats">Last visited: ${daysAgo(word.lastVisited)} days ago</p>
+                    `;
+                    wordCard.addEventListener('click', () => {
+                        wordInput.value = word.word;
+                        searchWord();
+                    });
+                    neglectedWordsList.appendChild(wordCard);
+                });
+            }
+        }
+
+        // Tab switching functionality
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and content
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+
+        // Event Listeners
+        searchButton.addEventListener('click', searchWord);
+        wordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') searchWord();
+        });
+        
+        addSentenceButton.addEventListener('click', addSentence);
+        newSentence.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') addSentence();
+        });
+        
+        cancelAdd.addEventListener('click', hideAddConfirmation);
+        confirmAdd.addEventListener('click', addNewWord);
+
+        // File handling event listeners
+        newDataButton.addEventListener('click', () => {
+            welcomeDialog.style.display = 'none';
+            // Start with empty data
+            vocabulary = {};
+            stats = {
+                totalSearches: 0,
+                lastUpdated: new Date().toISOString()
+            };
+            updateStats();
+        });
+        
+        loadExistingButton.addEventListener('click', () => {
+            welcomeDialog.style.display = 'none';
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                loadDataFromFile(e.target.files[0]);
+            }
+        });
+        
+        openFileButton.addEventListener('click', () => {
+            // Check for unsaved changes
+            if (hasUnsavedChanges) {
+                if (confirm("You have unsaved changes. Do you want to save before loading a new file?")) {
+                    saveDataToFile();
+                }
+            }
+            fileInput.click();
+        });
+        
+        saveFileButton.addEventListener('click', saveDataToFile);
+
+        // Show welcome dialog on load
+        window.addEventListener('load', () => {
+            welcomeDialog.style.display = 'flex';
+        });
+
+        // Warn before closing with unsaved changes
+        window.addEventListener('beforeunload', (e) => {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        });
+
+        // Initialize
+        updateStats();
+    </script>
+</body>
+</html>
