@@ -359,7 +359,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>Swedish <span>Vocab</span> Logbook</h1>
+            <h1>Swedish <span>Vocab</span> Log Book</h1>
             <div class="data-controls">
                 <div>
                     <button id="open-file-button" class="secondary">Load Data</button>
