@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swedish Vocab Log Book</title>
+    <title>Swedish Vocabulary Tracker</title>
     <style>
         :root {
             --primary: #005B99;
@@ -359,7 +359,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>Swedish <span>Vocab</span> Log Book</h1>
+            <h1>Swedish <span>Vocabulary</span> Tracker</h1>
             <div class="data-controls">
                 <div>
                     <button id="open-file-button" class="secondary">Load Data</button>
